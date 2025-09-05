@@ -3,6 +3,8 @@
 import { loginSchema } from '@/lib/validations/auth';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { authApiClient } from '@/lib/api-client';
+import type { LoginRequest, LoginResponse } from '@/lib/types/api';
 
 export async function loginAction(formData: FormData) {
   // Parse and validate form data
@@ -22,27 +24,13 @@ export async function loginAction(formData: FormData) {
   const { userName, password } = validatedFields.data;
 
   try {
-    // Call the RMOS API to authenticate
-    const response = await fetch('https://service.rmosweb.com/security/createToken', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        userName,
-        password,
-      }),
-    });
+    // Call the RMOS API to authenticate using the API client
+    const loginData: LoginRequest = {
+      userName,
+      password,
+    };
 
-    if (!response.ok) {
-      return {
-        errors: {
-          root: ['Invalid credentials. Please try again.'],
-        },
-      };
-    }
-
-    const token = await response.json();
+    const token = await authApiClient.post<LoginResponse>('/security/createToken', loginData);
 
     // Store JWT in httpOnly cookie
     const cookieStore = await cookies();

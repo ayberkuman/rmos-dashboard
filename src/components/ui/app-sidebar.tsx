@@ -2,6 +2,7 @@
 
 import * as React from "react";
 
+import { NavMain } from "@/components/ui/nav-main";
 import {
   Sidebar,
   SidebarContent,
@@ -11,20 +12,19 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { NavMain } from "@/components/ui/nav-main";
-import { File, Shell } from "lucide-react";
+import { ChartColumnIncreasing, Shell, ShieldBan } from "lucide-react";
 
 const data = {
   navMain: [
     {
-      title: "Dashboard",
-      url: "#",
-      icon: File,
+      title: "Forecast",
+      url: "/forecast",
+      icon: ChartColumnIncreasing,
     },
     {
-      title: "Forecast",
-      url: "#",
-      icon: File,
+      title: "Blacklist",
+      url: "/blacklist",
+      icon: ShieldBan,
     },
   ],
 };
@@ -41,7 +41,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             >
               <a href="#">
                 <Shell className="!size-5" />
-                <span className="text-base font-semibold">Acme Inc.</span>
+                <span className="text-base font-semibold">Rmos</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
