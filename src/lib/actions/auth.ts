@@ -1,10 +1,10 @@
 'use server';
 
+import { authApiClient } from '@/lib/api-client';
+import type { LoginRequest, LoginResponse } from '@/lib/types/api';
 import { loginSchema } from '@/lib/validations/auth';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { authApiClient } from '@/lib/api-client';
-import type { LoginRequest, LoginResponse } from '@/lib/types/api';
 
 export async function loginAction(formData: FormData) {
   // Parse and validate form data
@@ -49,7 +49,7 @@ export async function loginAction(formData: FormData) {
     if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
       throw error;
     }
-
+    console.log(error);
     console.error('Login error:', error);
     return {
       errors: {
@@ -57,4 +57,10 @@ export async function loginAction(formData: FormData) {
       },
     };
   }
+}
+
+export async function logoutAction() {
+  const cookieStore = await cookies();
+  cookieStore.delete('auth-token');
+  redirect("/");
 }

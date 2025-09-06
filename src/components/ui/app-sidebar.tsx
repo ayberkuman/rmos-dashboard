@@ -12,7 +12,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { ChartColumnIncreasing, Shell, ShieldBan } from "lucide-react";
+import { ChartColumnIncreasing, LogOut, Shell, ShieldBan } from "lucide-react";
+import { logout } from "@/lib/auth";
+import { logoutAction } from "@/lib/actions/auth";
 
 const data = {
   navMain: [
@@ -50,7 +52,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavMain items={data.navMain} />
       </SidebarContent>
-      <SidebarFooter>footer</SidebarFooter>
+      <SidebarFooter>
+        <SidebarMenuButton
+          onClick={() => {
+            logoutAction();
+          }}
+          className="data-[slot=sidebar-menu-button]:!p-1.5"
+        >
+          <LogOut />
+        </SidebarMenuButton>
+      </SidebarFooter>
     </Sidebar>
   );
 }

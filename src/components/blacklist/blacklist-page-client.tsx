@@ -159,32 +159,20 @@ export function BlacklistPageClient({
   return (
     <div className="space-y-6">
       {/* Header with Add Button */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Kara Liste Yönetimi</h1>
-          <p className="text-muted-foreground mt-2">
-            Kara liste kayıtlarını görüntüleyin, ekleyin ve düzenleyin
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            onClick={handleRefresh}
-            disabled={isLoading}
-          >
-            {isLoading ? "Yükleniyor..." : "Yenile"}
+      <div className="flex items-center justify-end gap-2">
+        <Button variant="outline" onClick={handleRefresh} disabled={isLoading}>
+          {isLoading ? "Yükleniyor..." : "Yenile"}
+        </Button>
+        <BlacklistFormDialog
+          mode="create"
+          onSubmit={handleCreate}
+          isLoading={isLoading}
+        >
+          <Button>
+            <Plus className="mr-2 h-4 w-4" />
+            Yeni Kayıt
           </Button>
-          <BlacklistFormDialog
-            mode="create"
-            onSubmit={handleCreate}
-            isLoading={isLoading}
-          >
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Yeni Kayıt
-            </Button>
-          </BlacklistFormDialog>
-        </div>
+        </BlacklistFormDialog>
       </div>
 
       {/* Error Message */}
