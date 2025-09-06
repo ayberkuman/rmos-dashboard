@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/sidebar";
 import { ChartColumnIncreasing, LogOut, Shell, ShieldBan } from "lucide-react";
 import { logout } from "@/lib/auth";
-import { logoutAction } from "@/lib/actions/auth";
+import { logoutAction } from "@/lib/server-actions/auth";
 
 const data = {
   navMain: [
@@ -52,7 +52,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavMain items={data.navMain} />
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="ml-auto">
         <SidebarMenuButton
           onClick={() => {
             logoutAction();

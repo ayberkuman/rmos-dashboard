@@ -5,7 +5,7 @@ import {
   fetchBlacklistData,
   createBlacklistEntry,
   updateBlacklistEntry,
-} from "@/lib/actions/blacklist";
+} from "@/lib/server-actions/blacklist";
 import type { BlacklistItem, BlacklistGetRequest } from "@/lib/types/api";
 import { BlacklistDataTable } from "@/components/blacklist/blacklist-data-table";
 import { BlacklistFormDialog } from "@/components/blacklist/blacklist-form-dialog";

@@ -62,18 +62,6 @@ class ApiClient {
       body: data ? JSON.stringify(data) : undefined,
     });
   }
-
-  async put<T>(endpoint: string, data?: unknown, options?: RequestInit): Promise<T> {
-    return this.request<T>(endpoint, {
-      ...options,
-      method: 'PUT',
-      body: data ? JSON.stringify(data) : undefined,
-    });
-  }
-
-  async delete<T>(endpoint: string, options?: RequestInit): Promise<T> {
-    return this.request<T>(endpoint, { ...options, method: 'DELETE' });
-  }
 }
 
 // Create instances for different services

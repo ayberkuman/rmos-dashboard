@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { fetchForecastData } from "@/lib/actions/forecast";
+import { fetchForecastData } from "@/lib/server-actions/forecast";
 import type { ForecastDataItem, ForecastRequest } from "@/lib/types/api";
 import { ForecastDataTable } from "@/components/forecast/forecast-data-table";
 import { ForecastChart } from "@/components/forecast/forecast-chart";
