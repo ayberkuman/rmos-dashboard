@@ -2,10 +2,10 @@ import {
   getForecastData,
   defaultForecastRequest,
 } from "@/lib/services/forecast";
-import { ForecastDataTable } from "@/components/forecast/forecast-data-table";
+import { ForecastPageClient } from "@/components/forecast/forecast-page-client";
 
 export default async function ForecastPage() {
-  // Fetch forecast data using our API client
+  // Fetch initial forecast data using our API client
   const forecastResponse = await getForecastData(defaultForecastRequest);
 
   if (!forecastResponse.isSucceded) {
@@ -15,7 +15,7 @@ export default async function ForecastPage() {
   }
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="container mx-auto p-6 flex flex-col">
       <div className="mb-6">
         <h1 className="text-3xl font-bold">Forecast Dashboard</h1>
         <p className="text-muted-foreground mt-2">
@@ -23,12 +23,10 @@ export default async function ForecastPage() {
         </p>
       </div>
 
-      <div className="bg-white rounded-lg shadow">
-        <div className="p-6">
-          <h2 className="text-xl font-semibold mb-4">Forecast Data</h2>
-          <ForecastDataTable data={forecastResponse.value} />
-        </div>
-      </div>
+      <ForecastPageClient
+        initialData={forecastResponse.value}
+        initialRequest={defaultForecastRequest}
+      />
     </div>
   );
 }

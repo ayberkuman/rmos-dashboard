@@ -2,24 +2,25 @@ import {
   getBlacklistData,
   defaultBlacklistRequest,
 } from "@/lib/services/blacklist";
+import { BlacklistPageClient } from "@/components/blacklist/blacklist-page-client";
 
 export default async function BlackListPage() {
   try {
-    // Fetch blacklist data using our API client
-    const blacklistData = await getBlacklistData(defaultBlacklistRequest);
+    // Fetch initial blacklist data using our API client
+    const blacklistResponse = await getBlacklistData(defaultBlacklistRequest);
+
+    if (!blacklistResponse.isSucceded) {
+      throw new Error(
+        blacklistResponse.message || "Failed to fetch blacklist data"
+      );
+    }
 
     return (
       <div className="container mx-auto p-6">
-        <h1 className="text-3xl font-bold mb-6">Blacklist Management</h1>
-
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Blacklist Data</h2>
-          <div className="bg-gray-50 p-4 rounded">
-            <pre className="text-sm overflow-auto">
-              {JSON.stringify(blacklistData, null, 2)}
-            </pre>
-          </div>
-        </div>
+        <BlacklistPageClient
+          initialData={blacklistResponse.value}
+          initialRequest={defaultBlacklistRequest}
+        />
       </div>
     );
   } catch (error) {
@@ -27,16 +28,16 @@ export default async function BlackListPage() {
 
     return (
       <div className="container mx-auto p-6">
-        <h1 className="text-3xl font-bold mb-6">Blacklist Management</h1>
+        <h1 className="text-3xl font-bold mb-6">Kara Liste Yönetimi</h1>
 
         <div className="bg-red-50 border border-red-200 rounded-lg p-6">
           <h2 className="text-xl font-semibold text-red-800 mb-2">
-            Error Loading Data
+            Veri Yükleme Hatası
           </h2>
           <p className="text-red-600">
             {error instanceof Error
               ? error.message
-              : "An unexpected error occurred"}
+              : "Beklenmeyen bir hata oluştu"}
           </p>
         </div>
       </div>

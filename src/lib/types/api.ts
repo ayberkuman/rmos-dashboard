@@ -158,10 +158,24 @@ export interface BlacklistItem {
   Adi: string;
   Soy: string;
   Aciklama: string;
+  Tcno: string | null;
+  Kimlik_no: string | null;
+  Dogum_tarihi: string | null;
+  Sistem_tarihi: string | null;
+  Sistem_grubu: string | null;
+  Otel_kodu: string | null;
+  Ulke_xml: string | null;
+  Kulanici: string | null;
+  Acenta: string | null;
+  "Xml Kodu": string | null;
+  "ULke Adı": string | null;
 }
 
 export interface BlacklistGetResponse {
-  data: BlacklistItem[];
+  isSucceded: boolean;
+  message: string | null;
+  messageList: string[];
+  value: BlacklistItem[];
 }
 
 export interface BlacklistCreateUpdateRequest {
@@ -170,9 +184,21 @@ export interface BlacklistCreateUpdateRequest {
   Adi: string;
   Soy: string;
   Aciklama: string;
+  Tcno?: string | null;
+  Kimlik_no?: string | null;
+  Dogum_tarihi?: string | null;
+  Sistem_grubu?: string | null;
+  Otel_kodu?: string | null;
+  Ulke_xml?: string | null;
+  Kulanici?: string | null;
+  Acenta?: string | null;
+  "Xml Kodu"?: string | null;
+  "ULke Adı"?: string | null;
 }
 
 export interface BlacklistCreateUpdateResponse {
-  success: boolean;
-  message?: string;
+  isSucceded: boolean;
+  message: string | null;
+  messageList: string[];
+  value: string;
 }
