@@ -12,7 +12,7 @@ export const defaultForecastRequest: ForecastRequest = {
   db_Id: 9,
   xRez_Sirket: 9,
   xBas_Tar: "2024-06-01",
-  xBit_Tar: "2024-06-30",
+  xBit_Tar: "2024-06-10",
   xtip: 1,
   kon1: "ALL",
   kon2: "BB",

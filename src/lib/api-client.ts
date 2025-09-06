@@ -25,6 +25,7 @@ class ApiClient {
         ...(this.token && { Authorization: `Bearer ${this.token}` }),
         ...options.headers,
       },
+      cache: "force-cache"
     };
 
     try {
