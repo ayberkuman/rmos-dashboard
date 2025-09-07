@@ -35,7 +35,7 @@ export function ForecastDatePicker({
   const [endOpen, setEndOpen] = React.useState(false);
 
   return (
-    <div className="flex items-end gap-4 p-4 bg-gray-50 rounded-lg">
+    <div className="flex md:flex-row flex-col items-start md:items-end gap-4 p-4 bg-gray-50 rounded-lg">
       <div className="flex flex-col gap-2">
         <Label htmlFor="start-date" className="text-sm font-medium">
           Başlangıç Tarihi
