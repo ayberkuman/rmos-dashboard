@@ -25,12 +25,14 @@ import {
 } from "@/components/ui/table";
 import type { ForecastDataItem } from "@/lib/types/api";
 import { forecastColumns } from "./forecast-columns";
+import { Loader2 } from "lucide-react";
 
 interface ForecastDataTableProps {
   data: ForecastDataItem[];
+  isLoading: boolean;
 }
 
-export function ForecastDataTable({ data }: ForecastDataTableProps) {
+export function ForecastDataTable({ data, isLoading }: ForecastDataTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -89,7 +91,18 @@ export function ForecastDataTable({ data }: ForecastDataTableProps) {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {isLoading ? (
+              <TableRow>
+                <TableCell
+                  colSpan={forecastColumns.length}
+                  className="h-24 text-center"
+                >
+                  <div className="flex justify-center items-center">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
@@ -111,7 +124,7 @@ export function ForecastDataTable({ data }: ForecastDataTableProps) {
                   colSpan={forecastColumns.length}
                   className="h-24 text-center"
                 >
-                  Veri bulunamadı.
+                  Data not found.
                 </TableCell>
               </TableRow>
             )}

@@ -2,50 +2,37 @@
 
 import * as React from "react";
 import {
-  fetchBlacklistData,
-  createBlacklistEntry,
-  updateBlacklistEntry,
-} from "@/lib/server-actions/blacklist";
-import type { BlacklistItem, BlacklistGetRequest } from "@/lib/types/api";
+  useBlacklistData,
+  useCreateBlacklistItem,
+  useUpdateBlacklistItem,
+  defaultBlacklistRequest,
+} from "@/lib/queries/blacklist";
+import type { BlacklistItem } from "@/lib/types/api";
 import { BlacklistDataTable } from "@/components/blacklist/blacklist-data-table";
 import { BlacklistFormDialog } from "@/components/blacklist/blacklist-form-dialog";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
-interface BlacklistPageClientProps {
-  initialData: BlacklistItem[];
-  initialRequest: BlacklistGetRequest;
-}
-
-export function BlacklistPageClient({
-  initialData,
-  initialRequest,
-}: BlacklistPageClientProps) {
-  const [data, setData] = React.useState<BlacklistItem[]>(initialData);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
+export function BlacklistPageClient() {
   const [editingItem, setEditingItem] = React.useState<
     BlacklistItem | undefined
   >(undefined);
 
-  const handleRefresh = async () => {
-    setIsLoading(true);
-    setError(null);
+  // Use TanStack Query to fetch blacklist data
+  const {
+    data: blacklistResponse,
+    isLoading,
+    error,
+    refetch,
+  } = useBlacklistData(defaultBlacklistRequest);
+  const createMutation = useCreateBlacklistItem();
+  const updateMutation = useUpdateBlacklistItem();
 
-    try {
-      const response = await fetchBlacklistData(initialRequest);
+  // Extract data from the response
+  const data = blacklistResponse?.value || [];
 
-      if (response.isSucceded) {
-        setData(response.value);
-      } else {
-        setError(response.message || "Veri alınırken hata oluştu");
-      }
-    } catch (err) {
-      setError("Bir hata oluştu. Lütfen tekrar deneyin.");
-      console.error("Blacklist data fetch error:", err);
-    } finally {
-      setIsLoading(false);
-    }
+  const handleRefresh = () => {
+    refetch();
   };
 
   const handleCreate = async (formData: {
@@ -63,39 +50,33 @@ export function BlacklistPageClient({
     xml_kodu?: string;
     ulke_adi?: string;
   }) => {
-    setIsLoading(true);
-    setError(null);
+    const request = {
+      db_Id: 9,
+      Id: 0, // 0 for new record
+      Adi: formData.adi,
+      Soy: formData.soy,
+      Aciklama: formData.aciklama,
+      Tcno: formData.tcno || null,
+      Kimlik_no: formData.kimlik_no || null,
+      Dogum_tarihi: formData.dogum_tarihi || null,
+      Sistem_grubu: formData.sistem_grubu || null,
+      Otel_kodu: formData.otel_kodu || null,
+      Ulke_xml: formData.ulke_xml || null,
+      Kulanici: formData.kulanici || null,
+      Acenta: formData.acenta || null,
+      "Xml Kodu": formData.xml_kodu || null,
+      "ULke Adı": formData.ulke_adi || null,
+    };
 
-    try {
-      const form = new FormData();
-      form.append("adi", formData.adi);
-      form.append("soy", formData.soy);
-      form.append("aciklama", formData.aciklama);
-      form.append("tcno", formData.tcno || "");
-      form.append("kimlik_no", formData.kimlik_no || "");
-      form.append("dogum_tarihi", formData.dogum_tarihi || "");
-      form.append("sistem_grubu", formData.sistem_grubu || "");
-      form.append("otel_kodu", formData.otel_kodu || "");
-      form.append("ulke_xml", formData.ulke_xml || "");
-      form.append("kulanici", formData.kulanici || "");
-      form.append("acenta", formData.acenta || "");
-      form.append("xml_kodu", formData.xml_kodu || "");
-      form.append("ulke_adi", formData.ulke_adi || "");
-
-      const response = await createBlacklistEntry(form);
-
-      if (response.isSucceded) {
-        // Refresh the data
-        await handleRefresh();
-      } else {
-        setError(response.message || "Kayıt oluşturulurken hata oluştu");
-      }
-    } catch (err) {
-      setError("Bir hata oluştu. Lütfen tekrar deneyin.");
-      console.error("Create blacklist entry error:", err);
-    } finally {
-      setIsLoading(false);
-    }
+    createMutation.mutate(request, {
+      onSuccess: () => {
+        // Success is handled by the mutation's onSuccess callback
+        console.log("Item created successfully");
+      },
+      onError: (error) => {
+        console.error("Create blacklist entry error:", error);
+      },
+    });
   };
 
   const handleUpdate = async (formData: {
@@ -115,46 +96,41 @@ export function BlacklistPageClient({
   }) => {
     if (!editingItem) return;
 
-    setIsLoading(true);
-    setError(null);
+    const request = {
+      db_Id: 9,
+      Id: editingItem.Id,
+      Adi: formData.adi,
+      Soy: formData.soy,
+      Aciklama: formData.aciklama,
+      Tcno: formData.tcno || null,
+      Kimlik_no: formData.kimlik_no || null,
+      Dogum_tarihi: formData.dogum_tarihi || null,
+      Sistem_grubu: formData.sistem_grubu || null,
+      Otel_kodu: formData.otel_kodu || null,
+      Ulke_xml: formData.ulke_xml || null,
+      Kulanici: formData.kulanici || null,
+      Acenta: formData.acenta || null,
+      "Xml Kodu": formData.xml_kodu || null,
+      "ULke Adı": formData.ulke_adi || null,
+    };
 
-    try {
-      const form = new FormData();
-      form.append("id", editingItem.Id.toString());
-      form.append("adi", formData.adi);
-      form.append("soy", formData.soy);
-      form.append("aciklama", formData.aciklama);
-      form.append("tcno", formData.tcno || "");
-      form.append("kimlik_no", formData.kimlik_no || "");
-      form.append("dogum_tarihi", formData.dogum_tarihi || "");
-      form.append("sistem_grubu", formData.sistem_grubu || "");
-      form.append("otel_kodu", formData.otel_kodu || "");
-      form.append("ulke_xml", formData.ulke_xml || "");
-      form.append("kulanici", formData.kulanici || "");
-      form.append("acenta", formData.acenta || "");
-      form.append("xml_kodu", formData.xml_kodu || "");
-      form.append("ulke_adi", formData.ulke_adi || "");
-
-      const response = await updateBlacklistEntry(form);
-
-      if (response.isSucceded) {
-        // Refresh the data
-        await handleRefresh();
+    updateMutation.mutate(request, {
+      onSuccess: () => {
         setEditingItem(undefined);
-      } else {
-        setError(response.message || "Kayıt güncellenirken hata oluştu");
-      }
-    } catch (err) {
-      setError("Bir hata oluştu. Lütfen tekrar deneyin.");
-      console.error("Update blacklist entry error:", err);
-    } finally {
-      setIsLoading(false);
-    }
+        console.log("Item updated successfully");
+      },
+      onError: (error) => {
+        console.error("Update blacklist entry error:", error);
+      },
+    });
   };
 
   const handleEdit = (item: BlacklistItem) => {
     setEditingItem(item);
   };
+
+  // Combined loading state for all operations (available if needed)
+  // const isAnyLoading = isLoading || createMutation.isPending || updateMutation.isPending;
 
   return (
     <div className="space-y-6">
@@ -166,7 +142,7 @@ export function BlacklistPageClient({
         <BlacklistFormDialog
           mode="create"
           onSubmit={handleCreate}
-          isLoading={isLoading}
+          isLoading={createMutation.isPending}
         >
           <Button>
             <Plus className="mr-2 h-4 w-4" />
@@ -175,10 +151,37 @@ export function BlacklistPageClient({
         </BlacklistFormDialog>
       </div>
 
-      {/* Error Message */}
+      {/* Error Messages */}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-800 text-sm">{error}</p>
+          <p className="text-red-800 text-sm">
+            {error.message || "Veri alınırken hata oluştu"}
+          </p>
+        </div>
+      )}
+
+      {createMutation.isError && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-800 text-sm">
+            {createMutation.error?.message ||
+              "Kayıt oluşturulurken hata oluştu"}
+          </p>
+        </div>
+      )}
+
+      {updateMutation.isError && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-800 text-sm">
+            {updateMutation.error?.message ||
+              "Kayıt güncellenirken hata oluştu"}
+          </p>
+        </div>
+      )}
+
+      {/* Loading State */}
+      {isLoading && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <p className="text-blue-800 text-sm">Veriler yükleniyor...</p>
         </div>
       )}
 
@@ -196,7 +199,7 @@ export function BlacklistPageClient({
           mode="edit"
           item={editingItem}
           onSubmit={handleUpdate}
-          isLoading={isLoading}
+          isLoading={updateMutation.isPending}
           open={true}
           onOpenChange={(open) => {
             if (!open) {

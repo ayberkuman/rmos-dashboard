@@ -1,60 +1,48 @@
 "use client";
 
 import * as React from "react";
-import { fetchForecastData } from "@/lib/server-actions/forecast";
-import type { ForecastDataItem, ForecastRequest } from "@/lib/types/api";
+import {
+  useForecastData,
+  defaultForecastRequest,
+} from "@/lib/queries/forecast";
+import type { ForecastRequest } from "@/lib/types/api";
 import { ForecastDataTable } from "@/components/forecast/forecast-data-table";
 import { ForecastChart } from "@/components/forecast/forecast-chart";
 import { ForecastDatePicker } from "@/components/forecast/forecast-date-picker";
 
-interface ForecastPageClientProps {
-  initialData: ForecastDataItem[];
-  initialRequest: ForecastRequest;
-}
-
-export function ForecastPageClient({
-  initialData,
-  initialRequest,
-}: ForecastPageClientProps) {
-  const [data, setData] = React.useState<ForecastDataItem[]>(initialData);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
-
-  // Initialize dates from the initial request
+export function ForecastPageClient() {
   const [startDate, setStartDate] = React.useState<Date | undefined>(
-    new Date(initialRequest.xBas_Tar)
+    new Date(defaultForecastRequest.xBas_Tar)
   );
   const [endDate, setEndDate] = React.useState<Date | undefined>(
-    new Date(initialRequest.xBit_Tar)
+    new Date(defaultForecastRequest.xBit_Tar)
   );
 
-  const handleApply = async () => {
-    if (!startDate || !endDate) return;
+  const currentRequest: ForecastRequest = React.useMemo(
+    () => ({
+      ...defaultForecastRequest,
+      xBas_Tar:
+        startDate?.toISOString().split("T")[0] ||
+        defaultForecastRequest.xBas_Tar,
+      xBit_Tar:
+        endDate?.toISOString().split("T")[0] || defaultForecastRequest.xBit_Tar,
+    }),
+    [startDate, endDate]
+  );
 
-    setIsLoading(true);
-    setError(null);
+  const {
+    data: forecastResponse,
+    isLoading,
+    error,
+    refetch,
+  } = useForecastData(currentRequest);
 
-    try {
-      const request: ForecastRequest = {
-        ...initialRequest,
-        xBas_Tar: startDate.toISOString().split("T")[0], // Format as YYYY-MM-DD
-        xBit_Tar: endDate.toISOString().split("T")[0], // Format as YYYY-MM-DD
-      };
-
-      const response = await fetchForecastData(request);
-
-      if (response.isSucceded) {
-        setData(response.value);
-      } else {
-        setError(response.message || "Veri alınırken hata oluştu");
-      }
-    } catch (err) {
-      setError("Bir hata oluştu. Lütfen tekrar deneyin.");
-      console.error("Forecast data fetch error:", err);
-    } finally {
-      setIsLoading(false);
-    }
+  const handleApply = () => {
+    // Trigger a refetch when date range is applied
+    refetch();
   };
+
+  const data = forecastResponse?.value || [];
 
   return (
     <div className="space-y-6">
@@ -71,7 +59,9 @@ export function ForecastPageClient({
       {/* Error Message */}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-800 text-sm">{error}</p>
+          <p className="text-red-800 text-sm">
+            {error.message || "Veri alınırken hata oluştu"}
+          </p>
         </div>
       )}
 
@@ -79,11 +69,12 @@ export function ForecastPageClient({
       <div className="bg-white rounded-lg shadow">
         <div className="p-6">
           <h2 className="text-xl font-semibold mb-4">Forecast Data</h2>
-          <ForecastDataTable data={data} />
+          <ForecastDataTable data={data} isLoading={isLoading} />
         </div>
       </div>
+
       {/* Chart Section */}
-      <ForecastChart data={data} />
+      <ForecastChart data={data} isLoading={isLoading} />
     </div>
   );
 }

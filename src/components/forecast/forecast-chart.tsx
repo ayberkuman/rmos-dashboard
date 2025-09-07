@@ -1,6 +1,6 @@
 "use client";
 
-import { TrendingUp } from "lucide-react";
+import { Loader2, TrendingUp } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, LabelList, XAxis } from "recharts";
 
 import {
@@ -23,6 +23,7 @@ import type { ForecastDataItem } from "@/lib/types/api";
 
 interface ForecastChartProps {
   data: ForecastDataItem[];
+  isLoading: boolean;
 }
 
 const chartConfig = {
@@ -40,7 +41,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function ForecastChart({ data }: ForecastChartProps) {
+export function ForecastChart({ data, isLoading }: ForecastChartProps) {
   // Transform the data for the chart
   const chartData = data.map((item) => ({
     date: item["Gun Tarih"],
@@ -66,41 +67,47 @@ export function ForecastChart({ data }: ForecastChartProps) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
-          <BarChart accessibilityLayer data={chartData}>
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="date"
-              tickLine={false}
-              tickMargin={10}
-              axisLine={false}
-              tickFormatter={(value) => String(value).replaceAll(".", "-")}
-            />
-            <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-            <ChartLegend content={<ChartLegendContent />} />
-            <Bar
-              dataKey="toplam-kisi"
-              stackId="a"
-              fill="var(--color-toplam-kisi)"
-              radius={[0, 0, 4, 4]}
-            />
-
-            <Bar
-              dataKey="mevcut"
-              stackId="a"
-              fill="var(--color-mevcut)"
-              radius={[4, 4, 0, 0]}
-            >
-              <LabelList
-                dataKey="doluluk-yuzde"
-                position="top"
-                className="fill-foreground"
-                fontSize={12}
-                formatter={(value: number) => `${value.toFixed(1)}%`}
+        {isLoading ? (
+          <div className="flex justify-center items-center">
+            <Loader2 className="h-4 w-4 animate-spin" />
+          </div>
+        ) : (
+          <ChartContainer config={chartConfig}>
+            <BarChart accessibilityLayer data={isLoading ? [] : chartData}>
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="date"
+                tickLine={false}
+                tickMargin={10}
+                axisLine={false}
+                tickFormatter={(value) => String(value).replaceAll(".", "-")}
               />
-            </Bar>
-          </BarChart>
-        </ChartContainer>
+              <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+              <ChartLegend content={<ChartLegendContent />} />
+              <Bar
+                dataKey="toplam-kisi"
+                stackId="a"
+                fill="var(--color-toplam-kisi)"
+                radius={[0, 0, 4, 4]}
+              />
+
+              <Bar
+                dataKey="mevcut"
+                stackId="a"
+                fill="var(--color-mevcut)"
+                radius={[4, 4, 0, 0]}
+              >
+                <LabelList
+                  dataKey="doluluk-yuzde"
+                  position="top"
+                  className="fill-foreground"
+                  fontSize={12}
+                  formatter={(value: number) => `${value.toFixed(1)}%`}
+                />
+              </Bar>
+            </BarChart>
+          </ChartContainer>
+        )}
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="flex gap-2 leading-none font-medium">

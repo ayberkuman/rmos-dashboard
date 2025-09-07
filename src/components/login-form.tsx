@@ -1,52 +1,49 @@
 "use client";
 
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { loginSchema, type LoginFormData } from "@/lib/validations/auth";
-import { loginAction } from "@/lib/server-actions/auth";
+import { useLoginMutation } from "@/lib/queries/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export function LoginForm() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [serverErrors, setServerErrors] = useState<{
-    root?: string[];
-    userName?: string[];
-    password?: string[];
-  }>({});
+  const router = useRouter();
+  const loginMutation = useLoginMutation();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    setError,
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
 
   const onSubmit = async (data: LoginFormData) => {
-    setIsLoading(true);
-    setServerErrors({});
-
-    try {
-      const formData = new FormData();
-      formData.append("userName", data.userName);
-      formData.append("password", data.password);
-
-      const result = await loginAction(formData);
-
-      if (result?.errors) {
-        setServerErrors(result.errors);
-      }
-    } catch (error) {
-      console.error("Form submission error:", error);
-      setServerErrors({
-        root: ["An unexpected error occurred. Please try again."],
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    loginMutation.mutate(data, {
+      onSuccess: () => {
+        // Redirect to forecast page on success
+        router.push("/forecast");
+      },
+      onError: (error) => {
+        // Handle login errors
+        if (
+          error.message.includes("401") ||
+          error.message.includes("Unauthorized")
+        ) {
+          setError("root", {
+            message: "Invalid credentials. Please try again.",
+          });
+        } else {
+          setError("root", {
+            message: "An unexpected error occurred. Please try again.",
+          });
+        }
+      },
+    });
   };
 
   return (
@@ -67,11 +64,6 @@ export function LoginForm() {
               {errors.userName.message}
             </p>
           )}
-          {serverErrors.userName && (
-            <p className="mt-1 text-sm text-red-600">
-              {serverErrors.userName[0]}
-            </p>
-          )}
         </div>
 
         <div>
@@ -89,27 +81,22 @@ export function LoginForm() {
               {errors.password.message}
             </p>
           )}
-          {serverErrors.password && (
-            <p className="mt-1 text-sm text-red-600">
-              {serverErrors.password[0]}
-            </p>
-          )}
         </div>
       </div>
 
-      {serverErrors.root && (
+      {errors.root && (
         <div className="rounded-md bg-red-50 p-4">
-          <div className="text-sm text-red-700">
-            {serverErrors.root.map((error, index) => (
-              <p key={index}>{error}</p>
-            ))}
-          </div>
+          <div className="text-sm text-red-700">{errors.root.message}</div>
         </div>
       )}
 
       <div>
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? "Signing in..." : "Sign in"}
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={loginMutation.isPending}
+        >
+          {loginMutation.isPending ? "Signing in..." : "Sign in"}
         </Button>
       </div>
 

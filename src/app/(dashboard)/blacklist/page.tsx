@@ -1,16 +1,28 @@
-import { BlacklistPageClient } from "@/components/blacklist/blacklist-page-client";
 import {
-  defaultBlacklistRequest,
-  getBlacklistData,
-} from "@/lib/services/blacklist";
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
+import { BlacklistPageClient } from "@/components/blacklist/blacklist-page-client";
+import { defaultBlacklistRequest } from "@/lib/queries/blacklist";
+import { blacklistKeys } from "@/lib/queries/blacklist";
+import { serverFetchBlacklistData } from "@/lib/queries/server-query-functions";
 
 export default async function BlackListPage() {
-  // Fetch initial blacklist data using our API client
-  const blacklistResponse = await getBlacklistData(defaultBlacklistRequest);
+  const queryClient = new QueryClient();
 
-  if (!blacklistResponse.isSucceded) {
-    throw new Error(
-      blacklistResponse.message || "Failed to fetch blacklist data"
+  try {
+    // Prefetch blacklist data on the server
+    await queryClient.prefetchQuery({
+      queryKey: blacklistKeys.list(defaultBlacklistRequest),
+      queryFn: () => serverFetchBlacklistData(defaultBlacklistRequest),
+      staleTime: 2 * 60 * 1000, // 2 minutes
+    });
+  } catch (error) {
+    // If prefetch fails (e.g., no auth token), the client will handle it
+    console.log(
+      "Server prefetch failed, client will handle authentication",
+      error
     );
   }
 
@@ -23,10 +35,9 @@ export default async function BlackListPage() {
         </p>
       </div>
 
-      <BlacklistPageClient
-        initialData={blacklistResponse.value}
-        initialRequest={defaultBlacklistRequest}
-      />
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <BlacklistPageClient />
+      </HydrationBoundary>
     </div>
   );
 }

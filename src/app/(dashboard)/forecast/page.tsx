@@ -1,16 +1,28 @@
 import {
-  getForecastData,
-  defaultForecastRequest,
-} from "@/lib/services/forecast";
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
 import { ForecastPageClient } from "@/components/forecast/forecast-page-client";
+import { defaultForecastRequest } from "@/lib/queries/forecast";
+import { forecastKeys } from "@/lib/queries/forecast";
+import { serverFetchForecastData } from "@/lib/queries/server-query-functions";
 
 export default async function ForecastPage() {
-  // Fetch initial forecast data using our API client
-  const forecastResponse = await getForecastData(defaultForecastRequest);
+  const queryClient = new QueryClient();
 
-  if (!forecastResponse.isSucceded) {
-    throw new Error(
-      forecastResponse.message || "Failed to fetch forecast data"
+  try {
+    // Prefetch forecast data on the server
+    await queryClient.prefetchQuery({
+      queryKey: forecastKeys.list(defaultForecastRequest),
+      queryFn: () => serverFetchForecastData(defaultForecastRequest),
+      staleTime: 5 * 60 * 1000, // 5 minutes
+    });
+  } catch (error) {
+    // If prefetch fails (e.g., no auth token), the client will handle it
+    console.log(
+      "Server prefetch failed, client will handle authentication",
+      error
     );
   }
 
@@ -23,10 +35,9 @@ export default async function ForecastPage() {
         </p>
       </div>
 
-      <ForecastPageClient
-        initialData={forecastResponse.value}
-        initialRequest={defaultForecastRequest}
-      />
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <ForecastPageClient />
+      </HydrationBoundary>
     </div>
   );
 }

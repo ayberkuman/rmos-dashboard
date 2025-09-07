@@ -13,8 +13,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { ChartColumnIncreasing, LogOut, Shell, ShieldBan } from "lucide-react";
-import { logout } from "@/lib/auth";
-import { logoutAction } from "@/lib/server-actions/auth";
+import { useLogout } from "@/lib/queries/auth";
 
 const data = {
   navMain: [
@@ -32,6 +31,8 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const logout = useLogout();
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -54,9 +55,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter className="ml-auto">
         <SidebarMenuButton
-          onClick={() => {
-            logoutAction();
-          }}
+          onClick={logout}
           className="data-[slot=sidebar-menu-button]:!p-1.5"
         >
           <LogOut />
