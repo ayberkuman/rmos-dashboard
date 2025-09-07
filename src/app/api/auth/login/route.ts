@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
   try {
     const body: LoginRequest = await request.json();
 
-    // Validate the request
+    // Check request data
     const validatedFields = loginSchema.safeParse(body);
 
     if (!validatedFields.success) {
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
 
     const { userName, password } = validatedFields.data;
 
-    // Call the RMOS API to authenticate
+    // Hit the auth API
     const loginData: LoginRequest = {
       userName,
       password,
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
 
     const token = await authApiClient.post<LoginResponse>('/security/createToken', loginData);
 
-    // Store JWT in httpOnly cookie
+    // Save token in httpOnly cookie
     const cookieStore = await cookies();
     cookieStore.set('auth-token', token, {
       httpOnly: true,

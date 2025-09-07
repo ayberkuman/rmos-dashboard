@@ -42,7 +42,7 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function ForecastChart({ data, isLoading }: ForecastChartProps) {
-  // Transform the data for the chart
+  // Format data for chart
   const chartData = data.map((item) => ({
     date: item["Gun Tarih"],
     "toplam-kisi": item["Toplam Kişi"],
@@ -50,7 +50,7 @@ export function ForecastChart({ data, isLoading }: ForecastChartProps) {
     "doluluk-yuzde": item["Yüzde%"] * 100, // Convert to percentage
   }));
 
-  // Calculate total occupancy percentage for the footer
+  // Get total occupancy for footer
   const totalPeople = data.reduce((sum, item) => sum + item["Toplam Kişi"], 0);
   const totalAvailable = data.reduce((sum, item) => sum + item.Mevcut, 0);
   const occupancyRate =

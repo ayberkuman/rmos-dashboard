@@ -1,13 +1,13 @@
-// Authentication types
+// Auth types
 export interface LoginRequest {
   userName: string;
   password: string;
 }
 
-// The login API returns the token directly as a string
+// Login returns token as string
 export type LoginResponse = string;
 
-// Forecast API types
+// Forecast types
 export interface ForecastRequest {
   db_Id: number;
   xRez_Sirket: number;
@@ -146,7 +146,7 @@ export interface ForecastResponse {
   value: ForecastDataItem[];
 }
 
-// Blacklist API types
+// Blacklist types
 export interface BlacklistGetRequest {
   db_Id: number;
   Adi: string;
@@ -180,7 +180,7 @@ export interface BlacklistGetResponse {
 
 export interface BlacklistCreateUpdateRequest {
   db_Id: number;
-  Id: number; // 0 for new record, existing ID for update
+  Id: number; // 0 for new, existing ID for update
   Adi: string;
   Soy: string;
   Aciklama: string;

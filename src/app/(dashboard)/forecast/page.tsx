@@ -12,14 +12,14 @@ export default async function ForecastPage() {
   const queryClient = new QueryClient();
 
   try {
-    // Prefetch forecast data on the server
+    // Load forecast data on the server for faster initial render
     await queryClient.prefetchQuery({
       queryKey: forecastKeys.list(defaultForecastRequest),
       queryFn: () => serverFetchForecastData(defaultForecastRequest),
       staleTime: 5 * 60 * 1000, // 5 minutes
     });
   } catch (error) {
-    // If prefetch fails (e.g., no auth token), the client will handle it
+    // If no auth token, client will handle login
     console.log(
       "Server prefetch failed, client will handle authentication",
       error

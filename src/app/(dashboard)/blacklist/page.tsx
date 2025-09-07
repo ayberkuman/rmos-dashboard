@@ -12,14 +12,14 @@ export default async function BlackListPage() {
   const queryClient = new QueryClient();
 
   try {
-    // Prefetch blacklist data on the server
+    // Load blacklist data on the server for faster initial render
     await queryClient.prefetchQuery({
       queryKey: blacklistKeys.list(defaultBlacklistRequest),
       queryFn: () => serverFetchBlacklistData(defaultBlacklistRequest),
       staleTime: 2 * 60 * 1000, // 2 minutes
     });
   } catch (error) {
-    // If prefetch fails (e.g., no auth token), the client will handle it
+    // If no auth token, client will handle login
     console.log(
       "Server prefetch failed, client will handle authentication",
       error

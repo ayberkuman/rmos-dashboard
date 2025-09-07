@@ -38,7 +38,7 @@ export function ForecastPageClient() {
   } = useForecastData(currentRequest);
 
   const handleApply = () => {
-    // Trigger a refetch when date range is applied
+    // Refresh data when date range changes
     refetch();
   };
 

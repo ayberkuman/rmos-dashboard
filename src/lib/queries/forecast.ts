@@ -2,14 +2,13 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchForecastData } from './query-functions';
 import type { ForecastRequest, ForecastResponse } from '@/lib/types/api';
 
-// Query keys for forecast
 export const forecastKeys = {
   all: ['forecast'] as const,
   lists: () => [...forecastKeys.all, 'list'] as const,
   list: (filters: ForecastRequest) => [...forecastKeys.lists(), filters] as const,
 } as const;
 
-// Default forecast request for testing
+// Sample request with some default values
 export const defaultForecastRequest: ForecastRequest = {
   db_Id: 9,
   xRez_Sirket: 9,
@@ -34,16 +33,15 @@ export const defaultForecastRequest: ForecastRequest = {
   cev_01: null,
 };
 
-// Hook to fetch forecast data
 export function useForecastData(request: ForecastRequest = defaultForecastRequest) {
   return useQuery<ForecastResponse, Error>({
     queryKey: forecastKeys.list(request),
     queryFn: () => fetchForecastData(request),
-    enabled: !!request, // Only run query if request is provided
+    enabled: !!request,
     staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
+    gcTime: 10 * 60 * 1000, // 10 minutes
     retry: (failureCount, error) => {
-      // Don't retry on authentication errors
+      // Skip retry for auth errors
       if (error.message.includes('401') || error.message.includes('No authentication token')) {
         return false;
       }

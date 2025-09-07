@@ -25,11 +25,11 @@ export function LoginForm() {
   const onSubmit = async (data: LoginFormData) => {
     loginMutation.mutate(data, {
       onSuccess: () => {
-        // Redirect to forecast page on success
+        // Go to dashboard
         router.push("/forecast");
       },
       onError: (error) => {
-        // Handle login errors
+        // Show error message
         if (
           error.message.includes("401") ||
           error.message.includes("Unauthorized")

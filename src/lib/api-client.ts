@@ -36,7 +36,7 @@ class ApiClient {
         throw new Error(`API Error ${response.status}: ${errorText}`);
       }
 
-      // Handle different response types
+      // Check response type
       const contentType = response.headers.get('content-type');
       if (contentType?.includes('application/json')) {
         return await response.json();
@@ -64,11 +64,11 @@ class ApiClient {
   }
 }
 
-// Create instances for different services
+// API clients for different services
 export const authApiClient = new ApiClient('https://service.rmosweb.com');
 export const frontApiClient = new ApiClient('https://frontapi.rmosweb.com/api');
 
-// Helper function to get authenticated front API client
+// Get authenticated client with token
 export async function getAuthenticatedFrontApiClient(): Promise<ApiClient> {
   const token = await getAuthToken();
 

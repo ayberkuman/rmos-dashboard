@@ -11,7 +11,7 @@ export default function BlacklistError({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log the error to an error reporting service
+    // Log error for debugging
     console.error("Blacklist page error:", error);
   }, [error]);
 

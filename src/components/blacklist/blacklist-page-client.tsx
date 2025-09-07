@@ -18,7 +18,6 @@ export function BlacklistPageClient() {
     BlacklistItem | undefined
   >(undefined);
 
-  // Use TanStack Query to fetch blacklist data
   const {
     data: blacklistResponse,
     isLoading,
@@ -27,8 +26,6 @@ export function BlacklistPageClient() {
   } = useBlacklistData(defaultBlacklistRequest);
   const createMutation = useCreateBlacklistItem();
   const updateMutation = useUpdateBlacklistItem();
-
-  // Extract data from the response
   const data = blacklistResponse?.value || [];
 
   const handleRefresh = () => {
@@ -52,7 +49,7 @@ export function BlacklistPageClient() {
   }) => {
     const request = {
       db_Id: 9,
-      Id: 0, // 0 for new record
+      Id: 0, // New record
       Adi: formData.adi,
       Soy: formData.soy,
       Aciklama: formData.aciklama,
@@ -70,7 +67,7 @@ export function BlacklistPageClient() {
 
     createMutation.mutate(request, {
       onSuccess: () => {
-        // Success is handled by the mutation's onSuccess callback
+        // Success handled by mutation
         console.log("Item created successfully");
       },
       onError: (error) => {
@@ -129,7 +126,6 @@ export function BlacklistPageClient() {
     setEditingItem(item);
   };
 
-  // Combined loading state for all operations (available if needed)
   // const isAnyLoading = isLoading || createMutation.isPending || updateMutation.isPending;
 
   return (

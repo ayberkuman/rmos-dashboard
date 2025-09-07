@@ -12,7 +12,6 @@ import type {
   BlacklistItem
 } from '@/lib/types/api';
 
-// Query keys for blacklist
 export const blacklistKeys = {
   all: ['blacklist'] as const,
   lists: () => [...blacklistKeys.all, 'list'] as const,
@@ -21,23 +20,22 @@ export const blacklistKeys = {
   detail: (id: number) => [...blacklistKeys.details(), id] as const,
 } as const;
 
-// Default blacklist request for testing
+// Default request params
 export const defaultBlacklistRequest: BlacklistGetRequest = {
   db_Id: 9,
   Adi: "ALL?",
   Tip: 9,
 };
 
-// Hook to fetch blacklist data
 export function useBlacklistData(request: BlacklistGetRequest = defaultBlacklistRequest) {
   return useQuery<BlacklistGetResponse, Error>({
     queryKey: blacklistKeys.list(request),
     queryFn: () => fetchBlacklistData(request),
-    enabled: !!request, // Only run query if request is provided
+    enabled: !!request,
     staleTime: 2 * 60 * 1000, // 2 minutes
-    gcTime: 5 * 60 * 1000, // 5 minutes (formerly cacheTime)
+    gcTime: 5 * 60 * 1000, // 5 minutes
     retry: (failureCount, error) => {
-      // Don't retry on authentication errors
+      // Skip retry for auth errors
       if (error.message.includes('401') || error.message.includes('No authentication token')) {
         return false;
       }
@@ -46,21 +44,19 @@ export function useBlacklistData(request: BlacklistGetRequest = defaultBlacklist
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 }
-
-// Hook to create a new blacklist item
 export function useCreateBlacklistItem() {
   const queryClient = useQueryClient();
 
   return useMutation<BlacklistCreateUpdateResponse, Error, BlacklistCreateUpdateRequest>({
     mutationFn: createBlacklistItem,
     onSuccess: (data, variables) => {
-      // Invalidate and refetch blacklist queries
+      // Refresh the blacklist data
       queryClient.invalidateQueries({ queryKey: blacklistKeys.all });
 
-      // Optionally, add the new item to the cache optimistically
+      // Add the new item to cache for instant UI update
       if (data.isSucceded && data.value) {
         const newItem: BlacklistItem = {
-          Id: parseInt(data.value), // Assuming the API returns the new ID
+          Id: parseInt(data.value), // API returns the new ID
           Adi: variables.Adi,
           Soy: variables.Soy,
           Aciklama: variables.Aciklama,
@@ -77,7 +73,7 @@ export function useCreateBlacklistItem() {
           "ULke Adı": variables["ULke Adı"] || null,
         };
 
-        // Update the cache for the default request
+        // Update cache with the new item
         queryClient.setQueryData<BlacklistGetResponse>(
           blacklistKeys.list(defaultBlacklistRequest),
           (oldData) => {
@@ -95,18 +91,16 @@ export function useCreateBlacklistItem() {
     },
   });
 }
-
-// Hook to update an existing blacklist item
 export function useUpdateBlacklistItem() {
   const queryClient = useQueryClient();
 
   return useMutation<BlacklistCreateUpdateResponse, Error, BlacklistCreateUpdateRequest>({
     mutationFn: updateBlacklistItem,
     onSuccess: (data, variables) => {
-      // Invalidate and refetch blacklist queries
+      // Refresh the blacklist data
       queryClient.invalidateQueries({ queryKey: blacklistKeys.all });
 
-      // Optionally, update the item in the cache optimistically
+      // Update the item in cache for instant UI update
       if (data.isSucceded) {
         queryClient.setQueryData<BlacklistGetResponse>(
           blacklistKeys.list(defaultBlacklistRequest),

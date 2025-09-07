@@ -6,7 +6,7 @@ import type {
   BlacklistGetResponse,
 } from '@/lib/types/api';
 
-// Server-side query functions that use httpOnly cookies
+// These use httpOnly cookies for server-side prefetching
 export async function serverFetchForecastData(request: ForecastRequest): Promise<ForecastResponse> {
   const client = await getAuthenticatedFrontApiClient();
   return client.post<ForecastResponse>('/Procedure/StpRmforKlasik_2', request);

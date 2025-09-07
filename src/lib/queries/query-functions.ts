@@ -9,24 +9,21 @@ import type {
   BlacklistCreateUpdateResponse,
 } from '@/lib/types/api';
 
-// Base URLs
 const AUTH_BASE_URL = 'https://service.rmosweb.com';
 const FRONT_API_BASE_URL = 'https://frontapi.rmosweb.com/api';
 
-// Token storage - we'll store the token in memory and sync with localStorage
+// Keep token in memory and sync with localStorage
 let authToken: string | null = null;
 
-// Initialize token from localStorage on client side
+// Grab token from localStorage when running in browser
 if (typeof window !== 'undefined') {
   authToken = localStorage.getItem('auth-token');
 }
 
-// Helper function to get auth token
 export function getAuthToken(): string | null {
   return authToken;
 }
 
-// Helper function to set auth token
 export function setAuthToken(token: string | null) {
   authToken = token;
   if (typeof window !== 'undefined') {
@@ -37,8 +34,6 @@ export function setAuthToken(token: string | null) {
     }
   }
 }
-
-// Generic fetch function with error handling
 async function apiRequest<T>(
   url: string,
   options: RequestInit = {}
@@ -59,7 +54,7 @@ async function apiRequest<T>(
       throw new Error(`API Error ${response.status}: ${errorText}`);
     }
 
-    // Handle different response types
+    // Check if response is JSON or plain text
     const contentType = response.headers.get('content-type');
     if (contentType?.includes('application/json')) {
       return await response.json();
@@ -73,8 +68,6 @@ async function apiRequest<T>(
     throw new Error('An unexpected error occurred');
   }
 }
-
-// Generic authenticated fetch function
 async function authenticatedApiRequest<T>(
   url: string,
   options: RequestInit = {}
@@ -97,7 +90,6 @@ async function authenticatedApiRequest<T>(
   return apiRequest<T>(url, config);
 }
 
-// Authentication query functions
 export async function loginUser(request: LoginRequest): Promise<LoginResponse> {
   return apiRequest<LoginResponse>(`${AUTH_BASE_URL}/security/createToken`, {
     method: 'POST',
@@ -105,7 +97,6 @@ export async function loginUser(request: LoginRequest): Promise<LoginResponse> {
   });
 }
 
-// Forecast query functions
 export async function fetchForecastData(request: ForecastRequest): Promise<ForecastResponse> {
   return authenticatedApiRequest<ForecastResponse>(
     `${FRONT_API_BASE_URL}/Procedure/StpRmforKlasik_2`,
@@ -115,8 +106,6 @@ export async function fetchForecastData(request: ForecastRequest): Promise<Forec
     }
   );
 }
-
-// Blacklist query functions
 export async function fetchBlacklistData(request: BlacklistGetRequest): Promise<BlacklistGetResponse> {
   return authenticatedApiRequest<BlacklistGetResponse>(
     `${FRONT_API_BASE_URL}/Kara/Getir_Kod`,
